@@ -1,38 +1,53 @@
 /*
  * Comments:
- *	Only use -debug if you want to compare individual send/receive packages
+ *	Only use -debug if you want to compare individual send/receive packages and
+ *	slow down the simulation (sleep for 2 seconds before 1 second loop starts again)
  */
 
 package Problem2;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.SocketException;
 
 public class UDPEchoClient extends NetworkLayer {
 	private static final String MSG = "An Echo Message!";
 
     public static void main(String[] args) {
+    	DatagramPacket sendPacket = null;
+    	DatagramPacket receivePacket = null;
+    	DatagramSocket socket = null;
+    	
+    	//Checks and sets arguments
     	validArguments(args);
     	
 		try {
 			/* Set up socket and bind socket */
-			setUpSocket();
-			socket.setSoTimeout((int)A_SECOND*10);	//Sets timeout of receiving packages to 10 seconds
+			SocketAddress localBindPoint = new InetSocketAddress(MYPORT);
+			socket = new DatagramSocket(null);	
+			socket.bind(localBindPoint);	
+			
+			socket.setSoTimeout((int)A_SECOND*6);	//Sets timeout of receiving packages to 6 seconds
 			
 			/* Create datagram packet for receiving echoed message */
-			receivePacket = setUpPackage(buf, buf.length);
+			receivePacket = new DatagramPacket(buf, buf.length);
 			
-			sendPacket = setUpPackage(MSG.getBytes(),MSG.length(),destinationIP,destinationPort);
+			SocketAddress remoteBindPoint = new InetSocketAddress(destinationIP,destinationPort);
+			
+			sendPacket = new DatagramPacket(MSG.getBytes(),MSG.getBytes().length,remoteBindPoint);
 			
 			/* Send and receive message*/
 			//Stores the received packets
 			DatagramPacket[] receivedPackets = new DatagramPacket[transmissionRate];
 		
-			long timerEnd = 0;
-			int packetCount = 0;
-			long timerStart = System.currentTimeMillis();
 			try {
 				while (true) {
+					long timerEnd = 0;
+					int packetCount = 0;
+					long timerStart = System.currentTimeMillis();
+					
 					//Attempts to send out as many packages as possible during a second, within the transmission rate
 					while (timerEnd-timerStart < A_SECOND && packetCount < transmissionRate) {
 						socket.send(sendPacket);
@@ -42,6 +57,10 @@ public class UDPEchoClient extends NetworkLayer {
 						packetCount++;
 						timerEnd = System.currentTimeMillis();
 					}
+					
+					//If debug mode, sleep for 2 seconds
+					if (DEBUG_MODE)
+						sleep();
 
 					/* Compare sent and received message */
 						
@@ -86,5 +105,13 @@ public class UDPEchoClient extends NetworkLayer {
 				else if (DEBUG_MODE)
 				    System.out.printf("Package #%d: Sent and received msg not equal!\n", i);
 		}
+    }
+    
+    private static void sleep()  {
+    	try {
+    		Thread.sleep(2000);
+    	} catch (InterruptedException e) {
+    		e.printStackTrace();
+    	}
     }
 }

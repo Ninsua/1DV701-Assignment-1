@@ -1,11 +1,5 @@
 package Problem2;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.net.SocketException;
-
 public abstract class NetworkLayer {
 	protected static boolean DEBUG_MODE = false;	//Shows packet comparison
 	protected static final int DEFAULT_BUFSIZE = 1024;
@@ -15,29 +9,6 @@ public abstract class NetworkLayer {
 	protected static int destinationPort = -1;
 	protected static int transmissionRate = 1; //Default transmission rate
 	protected static final double A_SECOND = 1000.0;
-	protected static DatagramSocket socket = null;
-	protected static DatagramPacket sendPacket = null;
-	protected static DatagramPacket receivePacket = null;
-	
-	protected static void setUpSocket() throws SocketException {
-			SocketAddress localBindPoint = new InetSocketAddress(MYPORT);
-			socket = new DatagramSocket(null);	
-			socket.bind(localBindPoint);	
-	}
-	
-	/* Create datagram packet */
-	protected static DatagramPacket setUpPackage(byte[] content, int length) {
-		return new DatagramPacket(content, length);
-	}
-	
-	/* Create datagram packet */
-	protected static DatagramPacket setUpPackage(byte[] content, int length, String IP, int port) {
-		/* Create remote endpoint */
-		SocketAddress remoteBindPoint = new InetSocketAddress(IP,port);
-		
-		/* Create datagram packet for sending message */
-		return new DatagramPacket(content, length, remoteBindPoint);
-	}
 	
 	protected static void validArguments(String[] arguments) {
 		//Makes sure IP and port are provided as arguments.
@@ -74,7 +45,7 @@ public abstract class NetworkLayer {
 		}
 		
 		//If buffer size is provided, validate it and set it to the byte array size
-		if (arguments.length == 4) {
+		if (arguments.length >= 4) {
 			if (!validBufferSize(arguments[3])) {
 			    System.err.printf("Invalid buffer size");
 			    System.exit(1);
@@ -86,7 +57,7 @@ public abstract class NetworkLayer {
 		}
 		
 		//Checks debug mode
-		if (arguments.length == 5) {
+		if (arguments.length >= 5) {
 			if ("-debug".compareTo(arguments[4]) == 0) {
 				DEBUG_MODE = true;
 			}
@@ -151,4 +122,5 @@ public abstract class NetworkLayer {
     	}
     	return true;
     }
+    
 }

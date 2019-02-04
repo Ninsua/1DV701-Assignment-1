@@ -5,21 +5,33 @@
 
 package Problem2;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.SocketException;
 
 public class UDPEchoServer extends NetworkLayer {
+	protected static DatagramPacket sendPacket = null;
+	protected static DatagramPacket receivePacket = null;
+	protected static DatagramSocket socket = null;
 	
     public static void main(String[] args) {
     	buf= new byte[DEFAULT_BUFSIZE];
     	MYPORT = 4950;
+    	DatagramPacket sendPacket = null;
+    	DatagramPacket receivePacket = null;
+    	DatagramSocket socket = null;
 		
 		try {
 			/* Create socket and bind to port */
-			setUpSocket();
-
+			SocketAddress localBindPoint = new InetSocketAddress(MYPORT);
+			socket = new DatagramSocket(null);	
+			socket.bind(localBindPoint);	
+			
 			while (true) {
 			    /* Create datagram packet for receiving message */
-			   receivePacket = setUpPackage(buf, buf.length);
+			   receivePacket = new DatagramPacket(buf, buf.length);
 		
 			    /* Send message*/
 			    try {
@@ -28,15 +40,14 @@ public class UDPEchoServer extends NetworkLayer {
 			
 				    /* Create datagram packet for sending message */
 					
-					sendPacket = setUpPackage(receivePacket.getData(),
+					sendPacket = new DatagramPacket(receivePacket.getData(),
 							receivePacket.getLength(),
-							receivePacket.getAddress().toString(),
+							receivePacket.getAddress(),
 							receivePacket.getPort()
 							);
 			    	
 					socket.send(sendPacket);
-					
-					
+
 				    System.out.printf("UDP echo request from %s", receivePacket.getAddress().getHostAddress());
 				    System.out.printf(" using port %d\n", receivePacket.getPort());
 				} catch (IOException e) {
