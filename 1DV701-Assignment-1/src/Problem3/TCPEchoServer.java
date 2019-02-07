@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import Problem2.NetworkLayer;
+import NetworkLayer.NetworkLayer;
 
 public class TCPEchoServer extends NetworkLayer {
 	//Maximum threads in the thread pool is number of CPUs + 1.
@@ -15,7 +15,18 @@ public class TCPEchoServer extends NetworkLayer {
 	
 	public static void main(String[] args) {
 		ExecutorService threadPool;
-    	MYPORT = 4950;
+    	MYPORT = DEFAULT_SERVER_PORT;
+    	int bufferSize = DEFAULT_BUFSIZE;
+    	
+    	try {
+        	if (validPort(args[0]))
+            	MYPORT = stringToInt(args[0]);
+        	
+        	if (validBufferSize(args[1]))
+        		bufferSize = stringToInt(args[1]);
+    	} catch (IndexOutOfBoundsException e) {
+    		//If an invalid input was give, the default will be used
+    	}
     	
 		threadPool = Executors.newFixedThreadPool(MAX_THREADS);
 		
@@ -32,7 +43,7 @@ public class TCPEchoServer extends NetworkLayer {
 			//Runs new task in the thread pool whenever a connection is established
 			while (true) {
 				Socket clientSocket = socket.accept();
-				threadPool.execute(new TCPEchoServerThread(clientSocket));
+				threadPool.execute(new TCPEchoServerThread(clientSocket,bufferSize));
 			}
 			
 			//Kill running threads

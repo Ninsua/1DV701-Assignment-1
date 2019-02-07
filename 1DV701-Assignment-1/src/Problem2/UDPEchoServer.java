@@ -11,6 +11,8 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
 
+import NetworkLayer.NetworkLayer;
+
 public class UDPEchoServer extends NetworkLayer {
 	protected static DatagramPacket sendPacket = null;
 	protected static DatagramPacket receivePacket = null;

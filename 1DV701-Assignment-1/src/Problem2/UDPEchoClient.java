@@ -1,7 +1,9 @@
 /*
  * Comments:
  *	Only use -debug if you want to compare individual send/receive packages and
- *	slow down the simulation (sleep for 2 seconds before 1 second loop starts again)
+ *	slow down the simulation (sleep for 2 seconds before 1 second loop starts again).
+ *	A buffer size smaller than the message will send the entire message
+ *	but will only receive as much as the buffer allows (as instructed by Morgan).
  */
 
 package Problem2;
@@ -11,6 +13,9 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
+
+import NetworkLayer.NetworkLayer;
+
 
 public class UDPEchoClient extends NetworkLayer {
 	private static final String MSG = "An Echo Message!";
@@ -70,7 +75,10 @@ public class UDPEchoClient extends NetworkLayer {
 					if (packetCount == transmissionRate) {
 						comparePackets(receivedPackets, packetCount);
 						System.out.printf("Sent %d packages in %f seconds on %s port %d \n",packetCount,timeToSend,destinationIP,destinationPort);
-						
+						System.out.printf("Echoed message: %s \n", new String(
+								receivedPackets[0].getData(),
+								receivedPackets[0].getOffset(),
+								receivedPackets[0].getLength()));
 					} else if (packetCount == 0) {	//If no packages were sent/received
 						System.err.println("No packages were sent/received");
 					} else {	//If all packages did not get sent within a second

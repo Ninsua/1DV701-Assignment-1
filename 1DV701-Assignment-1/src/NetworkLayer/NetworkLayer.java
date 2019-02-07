@@ -1,8 +1,9 @@
-
+package NetworkLayer;
 
 public abstract class NetworkLayer {
 	protected static boolean DEBUG_MODE = false;	//Shows packet comparison
 	protected static final int DEFAULT_BUFSIZE = 1024;
+	protected static final int DEFAULT_SERVER_PORT = 4950;
 	protected static int MYPORT = 0;
 	protected static String destinationIP;
 	protected static byte[] buf = null;
@@ -123,4 +124,11 @@ public abstract class NetworkLayer {
     	return true;
     }
     
+    protected static int stringToInt(String input) {
+    	try {
+    		return Integer.parseInt(input);
+    	} catch (NumberFormatException e) {
+    		return -1;
+    	}
+    }
 }
