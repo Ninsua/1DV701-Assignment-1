@@ -1,4 +1,4 @@
-package Problem2;
+package Problem3;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -6,6 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import Problem2.NetworkLayer;
 
 public class TCPEchoServer extends NetworkLayer {
 	//Maximum threads in the thread pool is number of CPUs + 1.
