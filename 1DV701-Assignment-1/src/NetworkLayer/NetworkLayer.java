@@ -14,7 +14,7 @@ public abstract class NetworkLayer {
 	protected static void validArguments(String[] arguments) {
 		//Makes sure IP and port are provided as arguments.
 		if (arguments.length < 2 || arguments.length > 5) {
-		    System.err.printf("Usage: server_name port transfer_rate buffer_size transmission_rate -debug\n");
+		    System.err.printf("Usage: server_name port transfer_rate buffer_size -debug\n");
 		    System.exit(1);
 		}
 		
@@ -59,7 +59,7 @@ public abstract class NetworkLayer {
 		
 		//Checks debug mode
 		if (arguments.length >= 5) {
-			if ("-debug".compareTo(arguments[4]) == 0) {
+			if (validDebugArgument(arguments[4])) {
 				DEBUG_MODE = true;
 			}
 		}
@@ -124,11 +124,27 @@ public abstract class NetworkLayer {
     	return true;
     }
     
+    protected static boolean validDebugArgument(String debugString) {
+		if (!("-debug".compareTo(debugString) == 0)) {
+			return false;
+		}
+		return true;
+    }
+    
     protected static int stringToInt(String input) {
     	try {
     		return Integer.parseInt(input);
     	} catch (NumberFormatException e) {
     		return -1;
+    	}
+    }
+    
+    @SuppressWarnings("unused")	//Only unused on the abstract class
+	protected static void sleep()  {
+    	try {
+    		Thread.sleep(5000);
+    	} catch (InterruptedException e) {
+    		e.printStackTrace();
     	}
     }
 }

@@ -1,12 +1,14 @@
 /*
- * Comments:
- *	Only use -debug if you want to compare individual send/receive packages and
- *	slow down the simulation (sleep for 2 seconds before 1 second loop starts again).
- *	A buffer size smaller than the message will send the entire message
- *	but will only receive as much as the buffer allows (as instructed by Morgan).
+ *	READ ME:
+ * 		The debug mode is highly recommended due to the infinite loop (specified by Morgan) that will loop the client forever.
+ * 		If the debug mode is activated the thread will sleep for 5 seconds before trying to echo again, prints exception stack traces
+ * 		and compare send and received packages.
+ *		A buffer size smaller than the message will send the entire message
+ *		but will only receive as much as the buffer allows (as instructed by Morgan).
  */
 
 package Problem2;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -15,7 +17,6 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 
 import NetworkLayer.NetworkLayer;
-
 
 public class UDPEchoClient extends NetworkLayer {
 	private static final String MSG = "An Echo Message!";
@@ -62,10 +63,6 @@ public class UDPEchoClient extends NetworkLayer {
 						packetCount++;
 						timerEnd = System.currentTimeMillis();
 					}
-					
-					//If debug mode, sleep for 2 seconds
-					if (DEBUG_MODE)
-						sleep();
 
 					/* Compare sent and received message */
 						
@@ -73,7 +70,8 @@ public class UDPEchoClient extends NetworkLayer {
 					double timeToSend = (timerEnd-timerStart)/A_SECOND;
 					
 					if (packetCount == transmissionRate) {
-						comparePackets(receivedPackets, packetCount);
+						if (DEBUG_MODE)
+							comparePackets(receivedPackets, packetCount);
 						System.out.printf("Sent %d packages in %f seconds on %s port %d \n",packetCount,timeToSend,destinationIP,destinationPort);
 						System.out.printf("Echoed message: %s \n", new String(
 								receivedPackets[0].getData(),
@@ -91,6 +89,10 @@ public class UDPEchoClient extends NetworkLayer {
 								+ "\n"
 								+ "Sent %d packages in %f seconds \n",remainingMessages,packetCount,timeToSend);
 					}
+					
+					//If debug mode, sleep for 2 seconds
+					if (DEBUG_MODE)
+						sleep();
 				}
 				} catch (IOException e) {
 					System.err.printf("Cannot reach %s on port %d \n",destinationIP,destinationPort);
@@ -108,18 +110,10 @@ public class UDPEchoClient extends NetworkLayer {
 				    		packetCollection[i].getOffset(),
 				    		packetCollection[i].getLength());
 			
-				if (DEBUG_MODE && receivedString.compareTo(MSG) == 0)
+				if (receivedString.compareTo(MSG) == 0)
 				    System.out.printf("Package #%d: %d bytes sent and received\n", i, packetCollection[i].getLength());
-				else if (DEBUG_MODE)
+				else
 				    System.out.printf("Package #%d: Sent and received msg not equal!\n", i);
 		}
-    }
-    
-    private static void sleep()  {
-    	try {
-    		Thread.sleep(2000);
-    	} catch (InterruptedException e) {
-    		e.printStackTrace();
-    	}
     }
 }
