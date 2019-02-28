@@ -40,9 +40,6 @@ public abstract class NetworkLayer {
 			    System.exit(1);
 			} else
 				transmissionRate = Integer.parseInt(arguments[2]);
-			
-			if (transmissionRate == 0)	//Makes sure that message is sent once if rate is 0
-				transmissionRate = 1;
 		}
 		
 		//If buffer size is provided, validate it and set it to the byte array size
@@ -131,18 +128,14 @@ public abstract class NetworkLayer {
 		return true;
     }
     
-    protected static int stringToInt(String input) {
-    	try {
-    		return Integer.parseInt(input);
-    	} catch (NumberFormatException e) {
-    		return -1;
-    	}
+    protected static int stringToInt(String input) throws NumberFormatException {
+    	return Integer.parseInt(input);
     }
     
     @SuppressWarnings("unused")	//Only unused on the abstract class
-	protected static void sleep()  {
+	protected static void sleep(int timeToSleep)  {
     	try {
-    		Thread.sleep(5000);
+    		Thread.sleep(timeToSleep);
     	} catch (InterruptedException e) {
     		e.printStackTrace();
     	}

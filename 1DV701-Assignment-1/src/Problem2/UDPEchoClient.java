@@ -92,7 +92,7 @@ public class UDPEchoClient extends NetworkLayer {
 					
 					//If debug mode, sleep for 2 seconds
 					if (DEBUG_MODE)
-						sleep();
+						sleep(5000);
 				}
 				} catch (IOException e) {
 					System.err.printf("Cannot reach %s on port %d \n",destinationIP,destinationPort);

@@ -37,10 +37,10 @@ public class TCPEchoServer extends NetworkLayer {
         	if (validDebugArgument(args[2])) {
         		DEBUG_MODE = true;
         	}
-    	} catch (IndexOutOfBoundsException e) {
+    	} catch (IndexOutOfBoundsException | NumberFormatException e) {
     		if (DEBUG_MODE)
     			e.printStackTrace();
-    		//If an invalid input was give, the default will be used
+    		//If an invalid input was given, the default values will be used
     	}
     	
 		threadPool = Executors.newFixedThreadPool(MAX_THREADS);

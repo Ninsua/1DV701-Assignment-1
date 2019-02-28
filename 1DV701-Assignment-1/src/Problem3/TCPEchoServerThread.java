@@ -20,12 +20,8 @@ public class TCPEchoServerThread extends NetworkLayer implements Runnable  {
 	@Override
 	public void run() {
 			try {
-				int readBytes = 1;
-				int bufferOffset = 0;
-				
-				//Set socket timeout to 10 seconds
-				client.setSoTimeout((int)A_SECOND*10);
-				
+				int readBytes = 0;
+
 				/*
 				 * Read until all message has been read.
 				 * If buffer size is too small, fill buffer,
@@ -35,19 +31,17 @@ public class TCPEchoServerThread extends NetworkLayer implements Runnable  {
 				InputStream readStream = client.getInputStream();
 				OutputStream writeStream = client.getOutputStream();
 				
-				while (readStream.available() != 0 && readBytes != -1) {
+				while (readBytes != -1) {
+					readBytes = readStream.read(buf);
+					
 					if (DEBUG_MODE)
-						System.out.println("Trying to read "+(buf.length-bufferOffset)+" bytes to offset "+bufferOffset);
-					readBytes = readStream.read(buf,bufferOffset,buf.length-bufferOffset);
+						System.out.println("Read "+readBytes+" into buffer.");
 					
 					if (readBytes > 0) {
-						if (DEBUG_MODE)
-							System.out.println("Trying to write "+readBytes+" bytes starting at offset "+bufferOffset);
-						writeStream.write(buf,bufferOffset,readBytes);
-						bufferOffset = bufferOffset+readBytes;
+						writeStream.write(buf,0,readBytes);
 						
-						if (bufferOffset >= buf.length || bufferOffset+readStream.available() >= buf.length)
-							bufferOffset = 0;
+						if (DEBUG_MODE)
+							System.out.println("Trying to write "+readBytes+" bytes");
 					}
 				}
 				
@@ -79,8 +73,10 @@ public class TCPEchoServerThread extends NetworkLayer implements Runnable  {
 					if (DEBUG_MODE)
 						System.out.println("Client socket successfully closed.");
 				} catch (IOException e) {
-					if (DEBUG_MODE)
+					if (DEBUG_MODE) {
 						e.printStackTrace();
+						System.out.println("Client socket could not be closed properly.");
+					}
 				}
 			}
 	}

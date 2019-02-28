@@ -14,13 +14,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+
 import NetworkLayer.NetworkLayer;
 
-
 public class TCPEchoClient extends NetworkLayer {
-	private static String MSG = "This is an echo message!"+"\n";/*"Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+	private static String MSG = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
 			+ "Sed viverra, justo eget ultrices dignissim, "
-			+ "leo nunc egestas erat, eget aliquet urna mauris nec nisi."+"\n";*/
+			+ "leo nunc egestas erat, eget aliquet urna mauris nec nisi."+"\n";
 	
 	private static String recievedMSG = "";
 	
@@ -32,7 +32,9 @@ public class TCPEchoClient extends NetworkLayer {
 		validArguments(args);
 		
 		try {
-			while (true) {
+			int rateCount = 0;
+			
+			while (transmissionRate > 0 || rateCount < 1) {
 				/* Set up socket*/
 				socket = new Socket();
 				
@@ -50,62 +52,58 @@ public class TCPEchoClient extends NetworkLayer {
 				
 				//Attempts to send out as many packages as possible during a second, within the transmission rate
 				long timerEnd = 0;
-				int rateCount = 0;
 				long timerStart = System.currentTimeMillis();
+				
+				rateCount = 0;
 				int bytesSent = 0;
-				while (timerEnd-timerStart < A_SECOND && rateCount < transmissionRate) {
+				while ((timerEnd-timerStart < A_SECOND && rateCount < transmissionRate) || (rateCount < 1)) {
 					//Write whole message to stream
 					writeStream.write(messageBytes,0,messageBytes.length);
-					bytesSent += messageBytes.length;
-					rateCount++;
+					bytesSent = messageBytes.length;
+					
+					//Read bytes from stream until the whole message has been read
+					recievedMSG = "";
+					int readBytes = 0;
+					
+					while (readBytes != -1 && recievedMSG.getBytes().length < bytesSent) {
+						readBytes = readStream.read(buf);
+						
+						if (DEBUG_MODE)
+							System.out.println("Read "+readBytes+" into buffer.");
+						
+						if (readBytes > 0) {
+							//Reconstruct string from buffer
+							recievedMSG += new String(buf,0,readBytes);
+						}
+					}
+
+					//Prints echoed message
+					System.out.println(recievedMSG);
 					
 					timerEnd = System.currentTimeMillis();
+					
+					rateCount++;
 				}
 				
 				//Calculate time to send
 				double timeToSend = (timerEnd-timerStart)/A_SECOND;
 				
 				//Check if all of the transmission rate could be sent within one second, if not, print stats
-				if (!(bytesSent == transmissionRate*messageBytes.length)) {
-					System.out.printf("Not all messages were sent. Remaining bytes: %d \n",transmissionRate*messageBytes.length-bytesSent);
+				if (!(rateCount*messageBytes.length == (transmissionRate == 0 ? 1 : transmissionRate)*messageBytes.length)) {
+					System.out.printf("Not all messages were sent/received. Remaining bytes: %d \n",(transmissionRate == 0 ? 1 : transmissionRate)*messageBytes.length-rateCount*messageBytes.length);
 				}
 				
 				//Print stats
 				System.out.printf("Sent %d bytes in %f seconds on %s port %d \n",bytesSent,timeToSend,destinationIP,destinationPort);
 				
-				//Read bytes from stream until the whole message has been read
-				recievedMSG = "";
-				int readBytes = 1;
-				int bufferOffset = 0;
-				while (recievedMSG.getBytes().length < bytesSent && readBytes != -1) {
-					if (DEBUG_MODE)
-						System.out.println("Trying to read "+(buf.length-bufferOffset)+" bytes to offset "+bufferOffset);
-					readBytes = readStream.read(buf,bufferOffset,buf.length-bufferOffset);
-					if (DEBUG_MODE)
-						System.out.println("Client bytes read: "+readBytes);
-					
-					if (readBytes > 0) {
-						//Reconstruct string from buffer
-						recievedMSG += new String(buf,bufferOffset,readBytes);
-						
-						//Set proper buffer offset. Makes sure that no reading of buffer 
-						bufferOffset = bufferOffset+readBytes;
-						if (bufferOffset >= buf.length || bufferOffset+readStream.available() >= buf.length)
-							bufferOffset = 0;
-					}
-				}
 
-				//Prints echoed message
-				System.out.println(recievedMSG);
-				
 				//Closes socket and streams.
 				writeStream.close();
 				readStream.close();
 				socket.close();
 				
-				//If debug mode, sleep
-				if (DEBUG_MODE)
-					sleep();
+				//Sleep for the remaining time of the second
+				sleep((int) Math.round(A_SECOND-timeToSend));
 			}
 		} catch (IOException e)  {
 			if (DEBUG_MODE)
@@ -118,6 +116,7 @@ public class TCPEchoClient extends NetworkLayer {
 			} catch (IOException e) {
 				if (DEBUG_MODE)
 					e.printStackTrace();
+				System.err.println("Error closing the connection.");
 			}
 		}
 
