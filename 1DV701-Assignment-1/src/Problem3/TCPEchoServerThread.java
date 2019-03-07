@@ -41,7 +41,7 @@ public class TCPEchoServerThread extends NetworkLayer implements Runnable  {
 						writeStream.write(buf,0,readBytes);
 						
 						if (DEBUG_MODE)
-							System.out.println("Trying to write "+readBytes+" bytes");
+							System.out.println("Wrote "+readBytes+" bytes");
 					}
 				}
 				
