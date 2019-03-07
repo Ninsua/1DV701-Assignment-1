@@ -59,10 +59,7 @@ public class TCPEchoServerThread extends NetworkLayer implements Runnable  {
 					}
 				}
 				
-				System.out.printf("Sucessfully delivered the message to %s port %d on Thread %s \n"
-						,client.getInetAddress().getHostAddress()
-						,client.getPort()
-						,Thread.currentThread().getName());
+				System.out.println("Sucessfully delivered the message(s).");
 			} catch (IOException e) {
 				if (DEBUG_MODE)
 					e.printStackTrace();

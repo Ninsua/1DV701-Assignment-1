@@ -85,7 +85,7 @@ public abstract class NetworkLayer {
     protected static boolean validPort(String port) {
     	try {
     		int portAsInteger = Integer.parseInt(port);
-    		if (portAsInteger < 0 || portAsInteger > 65535) //Port cannot be less than 0 or more than 65535
+    		if (portAsInteger <= 0 || portAsInteger > 65535) //Port cannot be less than 0 or more than 65535
     			return false;
     	} catch (NumberFormatException e) {
     		return false;	//If the port is not parsable to int, valid = false.

@@ -41,7 +41,7 @@ public class TCPEchoClient extends NetworkLayer {
 				//Bind to ephemeral local port
 				socket.bind(null);
 				
-				//Three way handshake
+				//Three way handshake, set timeout to 6 seconds
 				socket.connect(new InetSocketAddress(destinationIP,destinationPort),(int)A_SECOND*6);
 				
 				//Save streams
