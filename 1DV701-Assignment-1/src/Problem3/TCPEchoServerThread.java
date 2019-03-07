@@ -67,13 +67,12 @@ public class TCPEchoServerThread extends NetworkLayer implements Runnable  {
 			} finally {
 				try {
 					client.close();
-					if (DEBUG_MODE)
-						System.out.println("Client socket successfully closed.");
+					System.out.println("Client socket successfully closed.");
 				} catch (IOException e) {
-					if (DEBUG_MODE) {
+					if (DEBUG_MODE) 
 						e.printStackTrace();
-						System.out.println("Client socket could not be closed properly.");
-					}
+					System.out.println("Client socket could not be closed properly.");
+					
 				}
 			}
 	}

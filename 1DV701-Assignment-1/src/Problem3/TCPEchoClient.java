@@ -1,10 +1,6 @@
 /*	READ ME:
  * 		The program takes the following arguments: server_name port transmission_rate buffer_size -debug
  * 		
- * 		The debug mode is highly recommended due to the infinite loop (specified by Morgan) that will loop the client forever.
- * 		If the debug mode is activated the thread will sleep for 5 seconds before trying to echo again, print exception stack traces
- * 		and other things that might be interesting to know
- * 		regarding stream writing/read and buffer information.
  */
 
 package Problem3;

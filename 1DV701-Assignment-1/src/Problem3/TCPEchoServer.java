@@ -41,6 +41,7 @@ public class TCPEchoServer extends NetworkLayer {
     		if (DEBUG_MODE)
     			e.printStackTrace();
     		//If an invalid input was given, the default values will be used
+    		System.err.println("Invalid arguments detected, defaulting to default values...");
     	}
     	
 		threadPool = Executors.newFixedThreadPool(MAX_THREADS);
